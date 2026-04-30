@@ -1,58 +1,95 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <h1 align="center">ito Web App</h1>
 </p>
 
-## About Laravel
+<p align="center">
+<a href="https://laravel.com"><img src="https://img.shields.io/badge/Laravel-FF2D20.svg?logo=laravel&logoColor=white" alt="Laravel"></a>
+<a href="https://react.dev/"><img src="https://img.shields.io/badge/React-61DAFB.svg?logo=react&logoColor=black" alt="React"></a>
+<a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-3178C6.svg?logo=typescript&logoColor=white" alt="TypeScript"></a>
+<a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-success.svg" alt="License"></a>
+</p>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## About
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+カードゲーム「ito」のWebアプリです。URLを共有するだけでどこでも遊べます。アカウント登録は不要です。
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Tech Stack
 
-## Learning Laravel
+- **Backend**: Laravel (PHP)
+- **Frontend**: React + TypeScript (Vite)
+- **Database**: MySQL
+- **Real-time**: Laravel Reverb (WebSocket)
+- **AI**: Anthropic API (Claude)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Game Flow
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+1. ルームを作成してURLを参加者に共有
+2. 各プレイヤーは名前とアイコンを設定して入室
+3. ライフ数・数字の範囲・お題の難易度・ラウンド数を設定してゲーム開始
+4. 各自にランダムな数字が配られ、お題が表示される（AI生成 or 手動入力）
+5. お題に沿った例えをテキストで入力して全員に開示
+6. 相談しながら各自のタイミングで「カードを出す」
+7. 全員出し終えたら結果発表。順番を間違えるとライフが減少
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Getting Started
 
 ```bash
-composer require laravel/boost --dev
+# リポジトリのクローン
+git clone <repository-url>
+cd <project-name>
 
-php artisan boost:install
+# 環境変数のセットアップ
+cp .env.example .env
+
+# コンテナの起動
+./vendor/bin/sail up -d
+
+# パッケージのインストール
+./vendor/bin/sail composer install
+./vendor/bin/sail npm install
+
+# アプリケーションキーの生成
+./vendor/bin/sail artisan key:generate
+
+# データベースのマイグレーション
+./vendor/bin/sail artisan migrate
+
+# フロントエンドのビルド（開発）
+./vendor/bin/sail npm run dev
+
+# WebSocketサーバーの起動
+./vendor/bin/sail artisan reverb:start
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Environment Variables
 
-## Contributing
+`.env.example` をコピーして `.env` を作成し、以下の項目を設定してください。
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```env
+# Database
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=ito
+DB_USERNAME=sail
+DB_PASSWORD=password
+```
 
-## Code of Conduct
+## Commands
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+# Lint (PHP)
+./vendor/bin/sail pint
 
-## Security Vulnerabilities
+# Lint (Frontend)
+./vendor/bin/sail npm run lint
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+# Format (Frontend)
+./vendor/bin/sail npm run format
 
-## License
+# Test (PHP)
+./vendor/bin/sail artisan test
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# Test (Frontend)
+./vendor/bin/sail npm run test
+```
