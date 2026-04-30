@@ -1,0 +1,102 @@
+name: PR Description
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  pr-description:
+    if: |
+      github.event.pull_request.user.login != 'renovate[bot]' &&
+      github.event.pull_request.user.login != 'renovate' &&
+      github.event.pull_request.user.login != 'dependabot[bot]' &&
+      github.event.pull_request.user.login != 'dependabot' &&
+      github.event.pull_request.user.login != 'claude[bot]' &&
+      github.event.pull_request.user.login != 'claude'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    concurrency:
+      group: pr-description-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Check if merge commit
+        id: check_commit
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          if [[ "$COMMIT_MSG" == "Merge branch"* ]] || [[ "$COMMIT_MSG" == "Merge pull request"* ]]; then
+            echo "is_merge=true" >> $GITHUB_OUTPUT
+            echo "Merge commit detected. Skipping description update."
+          else
+            echo "is_merge=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Generate and set PR description
+        if: steps.check_commit.outputs.is_merge == 'false'
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: |
+            --allowedTools "Bash(gh pr:*), Bash(gh pr edit:*), Bash(gh pr view:*), Bash(gh pr diff:*), Bash(git fetch:*), Bash(git diff:*), Write, Read"
+          prompt: |
+            push によって「増えた・減った」変更だけを PR description に反映し、それ以外は触らないでください。
+
+            【前提】PR description の先頭付近に、必要に応じて「Parent: ブランチ名」という行が書かれている場合があります。
+            例:
+            Parent: feature/some-branch
+
+            Parent 行がある場合は、そのブランチを「親ブランチ」とみなし、その親ブランチと現在の HEAD（この PR のブランチ）との差分だけを対象にしてください。
+            Parent 行がない場合は、これまで通り GitHub の base ブランチ（例: develop）と HEAD の差分を対象にしてください。
+
+            【評価対象】PR description に書くのは、この PR で新たに入った差分のみとする。main との差分ではなく、
+            - Parent 行がある場合: 親ブランチ（Parent で指定されたブランチ）との差分のみを対象とする
+            - Parent 行がない場合: この PR の base ブランチ（例: develop）との差分のみを対象とする
+            親 PR で既に入っている変更は description に含めない（スタック PR 運用）。
+
+            1. 現在の PR body を取得する
+               - `gh pr view ${{ github.event.pull_request.number }} --json body -q .body` で現在の description を取得し、内容を把握する
+               - 先頭から「Parent: xxx」という形式の行を探し、見つかった場合は xxx を親ブランチ名として記憶する（以降 PARENT_BRANCH と呼ぶ）
+
+            2. 現在の差分を取得する
+               - PARENT_BRANCH が見つかった場合:
+                 - 必要に応じて `git fetch origin ${PARENT_BRANCH}` を実行し最新化する
+                 - `git diff origin/${PARENT_BRANCH}...HEAD` で diff を取得する（親ブランチ..現在のブランチの差分）
+               - PARENT_BRANCH が見つからなかった場合:
+                 - これまで通り `gh pr view ${{ github.event.pull_request.number }} --json files --jq '.files[].path'` で変更ファイル一覧を取得
+                 - `gh pr diff ${{ github.event.pull_request.number }}` で base..head の diff を取得する
+
+            3. 更新するのは「変更内容」の部分だけにする
+               - 現在の description に「## 変更内容」セクションがあれば、その箇条書きだけを「今の diff に含まれるファイル・変更」に合わせて書き換える。
+                 - 今回の diff に新しく含まれたファイル・変更 → 箇条書きに追加する
+                 - 今回の diff から外れた（消えた）ファイル・変更 → 箇条書きから削除する
+                 - 既存の箇条書きのうち、今も diff に含まれるものは必要に応じて文言だけ微修正可（ファイル名・内容が変わっていれば）
+               - 「## 概要」「## 実装方針・補足」「## その他」は**変更しない**。既存の文をそのまま残す。
+               - まだ description が空または「## 変更内容」がない場合は、次のフォーマットで全体を初回生成する。日本語で書く。
+
+            ## 概要
+            （この PR で何をしたかを 1〜2 行で）
+
+            ## 変更内容
+            - （現在の diff に基づく箇条書き）
+
+            ## 実装方針・補足
+            - 特になし（または補足があれば）
+
+            ## その他
+            - 動作確認: （分かる範囲で）
+            - テスト: 特になし（またはあれば）
+            - メモ: （あれば）
+
+            4. 更新した内容を PR に反映する
+               - 上記ルールで編集した全文を一時ファイル（例: `/tmp/pr_description.md`）に保存
+               - `gh pr edit ${{ github.event.pull_request.number }} --body-file /tmp/pr_description.md` で PR body を更新
+
+            重要: 概要・実装方針・その他は上書きしない。増減したのは「変更内容」の箇条書きだけなので、そこだけ diff に合わせて追加・削除・更新すること。

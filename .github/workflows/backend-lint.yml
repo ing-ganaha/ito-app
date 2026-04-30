@@ -1,0 +1,55 @@
+name: backend-lint
+
+on:
+  workflow_call:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "**/*.php"
+      - "composer.json"
+      - "composer.lock"
+      - ".github/workflows/backend-lint.yml"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    concurrency:
+      group: backend-lint-${{ github.event.pull_request.number || github.sha }}
+      cancel-in-progress: true
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          tools: composer:v2
+          coverage: none
+
+      - name: Verify dependencies
+        run: composer validate --strict
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: PSR Check
+        run: composer psr-check
+
+      - name: Pint
+        run: composer pint -- --test
+
+      - name: PHPStan
+        run: composer phpstan
+
+      - name: PHPMD
+        run: composer phpmd

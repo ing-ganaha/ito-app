@@ -68,6 +68,18 @@
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
         ],
+        "psr-check": [
+            "composer dump-autoload --optimize --strict-psr"
+        ],
+        "pint": [
+            "./vendor/bin/pint"
+        ],
+        "phpstan": [
+            "./vendor/bin/phpstan analyse"
+        ],
+        "phpmd": [
+            "./vendor/bin/phpmd app text cleancode,codesize,design,naming,unusedcode"
+        ],
         "qa": [
             "./vendor/bin/pint",
             "./vendor/bin/phpstan analyse",
