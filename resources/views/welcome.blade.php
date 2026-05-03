@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ config('app.name', 'ITO') }}</title>
+    @viteReactRefresh
     @vite(['resources/react/App.tsx'])
 </head>
 <body>

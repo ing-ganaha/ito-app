@@ -5,11 +5,11 @@ import laravel from "laravel-vite-plugin";
 
 export default defineConfig({
   plugins: [
+    react(),
     laravel({
       input: ["resources/react/App.tsx"],
       refresh: true,
     }),
-    react(),
   ],
   resolve: {
     alias: {
@@ -17,6 +17,7 @@ export default defineConfig({
     },
   },
   server: {
+    host: "127.0.0.1",
     watch: {
       ignored: ["**/storage/framework/views/**"],
     },
