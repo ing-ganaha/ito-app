@@ -3,13 +3,12 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router";
 
-import { adminRoutes } from "@/features/admin/routes";
-import { userRoutes } from "@/features/user/routes";
+import { gameRoutes } from "@/features/game/routes";
 import { Provider } from "@/libs/chakra-ui/provider";
 import { queryClient } from "@/libs/tanstack-query";
 import "@/styles/global.css";
 
-const router = createBrowserRouter([...adminRoutes, ...userRoutes]);
+const router = createBrowserRouter([...gameRoutes]);
 
 const root = document.getElementById("app");
 

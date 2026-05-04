@@ -8,6 +8,7 @@
         "eslint": "eslint --fix resources/react",
         "format": "prettier -cw resources/react",
         "check": "npm run eslint && tsc --noEmit && npm run format",
+        "qa": "npm run check",
         "orval": "orval",
         "chakra:snippet": "chakra snippet add"
     },
