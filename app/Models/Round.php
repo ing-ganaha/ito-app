@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Database\Factories\RoundFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,8 +17,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'topic',
     'is_active',
 ])]
+#[UseFactory(RoundFactory::class)]
 class Round extends Model
 {
+    /** @use HasFactory<RoundFactory> */
     use HasFactory;
 
     /**

@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Database\Factories\PlayerFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,8 +18,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'example',
     'is_submitted',
 ])]
+#[UseFactory(PlayerFactory::class)]
 class Player extends Model
 {
+    /** @use HasFactory<PlayerFactory> */
     use HasFactory;
 
     /**
