@@ -1,0 +1,42 @@
+name: frontend-lint
+
+on:
+  workflow_call:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "resources/**/*.ts"
+      - "resources/**/*.tsx"
+      - "resources/**/*.css"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "eslint.config.js"
+      - ".github/workflows/frontend-lint.yml"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    concurrency:
+      group: frontend-lint-${{ github.event.pull_request.number || github.sha }}
+      cancel-in-progress: true
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: ESLint
+        run: npm run lint
+
+      - name: Prettier
+        run: npm run format:check
