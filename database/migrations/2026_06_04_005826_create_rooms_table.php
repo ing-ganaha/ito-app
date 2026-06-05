@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('code')->unique()->comment('参加用コード');
             $table->string('status')->default(RoomStatus::Waiting->value)->comment('waiting / playing / finished');
             $table->text('topic')->nullable()->comment('Claude が生成するお題');
-            $table->unsignedBigInteger('host_player_id')->nullable()->comment('ホストの players.id（FK制約なし・循環参照回避）');
             $table->timestamps();
         });
     }
