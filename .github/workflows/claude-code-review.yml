@@ -30,8 +30,8 @@ jobs:
       - name: Check if merge commit
         id: check_commit
         run: |
-          PARENT_COUNT=$(git log -1 --pretty=%P | wc -w)
-          if [ "$PARENT_COUNT" -ge 2 ]; then
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          if [[ "$COMMIT_MSG" == "Merge pull request"* ]]; then
             echo "is_merge=true" >> $GITHUB_OUTPUT
             echo "Merge commit detected. Skipping review."
           else
