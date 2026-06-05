@@ -56,7 +56,6 @@ waiting ──start──▶ playing ──全員ready──▶ finished
 | code                    | CHAR(6) UNIQUE  | 参加用6桁コード                    |
 | status                  | VARCHAR         | `waiting` / `playing` / `finished` |
 | topic                   | TEXT nullable   | Claude が生成するお題              |
-| host_player_id          | BIGINT nullable | ホストの players.id (FK制約なし)   |
 | created_at / updated_at | TIMESTAMP       |                                    |
 
 ### players
@@ -68,6 +67,7 @@ waiting ──start──▶ playing ──全員ready──▶ finished
 | name                    | VARCHAR(20)       | UNIQUE per room                                                                              |
 | secret_token            | CHAR(64)          | bin2hex(random_bytes(32))                                                                    |
 | number                  | SMALLINT nullable | 1〜100、ゲーム開始時にセット                                                                 |
+| is_host                 | BOOLEAN           | ルーム作成者のみ true                                                                        |
 | is_ready                | BOOLEAN           | 待機室: 「準備OK」押下で true / ゲーム開始時にリセット / ゲーム中: 「結果を見る」押下で true |
 | created_at / updated_at | TIMESTAMP         |                                                                                              |
 
