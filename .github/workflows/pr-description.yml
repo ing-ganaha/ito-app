@@ -32,7 +32,7 @@ jobs:
         id: check_commit
         run: |
           COMMIT_MSG=$(git log -1 --pretty=%B)
-          if [[ "$COMMIT_MSG" == "Merge branch"* ]] || [[ "$COMMIT_MSG" == "Merge pull request"* ]]; then
+          if [[ "$COMMIT_MSG" == "Merge pull request"* ]]; then
             echo "is_merge=true" >> $GITHUB_OUTPUT
             echo "Merge commit detected. Skipping description update."
           else
