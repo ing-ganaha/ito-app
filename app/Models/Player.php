@@ -35,10 +35,8 @@ class Player extends Model
         ];
     }
 
-    protected static function boot(): void
+    protected static function booted(): void
     {
-        parent::boot();
-
         static::creating(function (self $player): void {
             $player->secret_token ??= bin2hex(random_bytes(32));
         });
