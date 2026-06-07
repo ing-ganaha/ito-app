@@ -20,7 +20,6 @@ class PlayerFactory extends Factory
         return [
             'room_id' => Room::factory(),
             'name' => fake()->userName(),
-            'secret_token' => bin2hex(random_bytes(32)),
             'number' => null,
             'is_host' => false,
             'is_ready' => false,
