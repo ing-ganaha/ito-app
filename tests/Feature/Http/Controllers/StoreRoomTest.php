@@ -6,18 +6,23 @@ namespace Tests\Feature\Http\Controllers;
 
 use App\Enums\RoomStatus;
 use App\Models\Room;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Tests\TestCase;
 
-class StoreRoomControllerTest extends TestCase
+/**
+ * @internal
+ *
+ * @coversNothing
+ */
+class StoreRoomTest extends TestCase
 {
-    use RefreshDatabase;
+    use LazilyRefreshDatabase;
 
     public function test_creates_room_and_host_player(): void
     {
-        $response = $this->postJson('/api/rooms', ['name' => 'たろう']);
+        $response = $this->postJson(route('rooms.store'), ['name' => 'たろう']);
 
-        $response->assertOk();
+        $response->assertCreated();
 
         $room = Room::query()->sole();
         $player = $room->players()->sole();
@@ -41,7 +46,7 @@ class StoreRoomControllerTest extends TestCase
 
     public function test_room_code_is_six_uppercase_characters(): void
     {
-        $response = $this->postJson('/api/rooms', ['name' => 'たろう']);
+        $response = $this->postJson(route('rooms.store'), ['name' => 'たろう']);
 
         $code = $response->json('data.code');
 
@@ -50,7 +55,7 @@ class StoreRoomControllerTest extends TestCase
 
     public function test_requires_name(): void
     {
-        $response = $this->postJson('/api/rooms', []);
+        $response = $this->postJson(route('rooms.store'), []);
 
         $response->assertUnprocessable();
         $response->assertJsonValidationErrors('name');
@@ -60,7 +65,7 @@ class StoreRoomControllerTest extends TestCase
 
     public function test_rejects_name_longer_than_twenty_characters(): void
     {
-        $response = $this->postJson('/api/rooms', ['name' => str_repeat('a', 21)]);
+        $response = $this->postJson(route('rooms.store'), ['name' => str_repeat('a', 21)]);
 
         $response->assertUnprocessable();
         $response->assertJsonValidationErrors('name');
