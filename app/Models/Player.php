@@ -6,12 +6,14 @@ namespace App\Models;
 
 use Database\Factories\PlayerFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['room_id', 'name', 'secret_token', 'number', 'is_host', 'is_ready'])]
+#[Fillable(['name', 'is_ready'])]
+#[Hidden(['secret_token'])]
 #[UseFactory(PlayerFactory::class)]
 class Player extends Model
 {
@@ -31,5 +33,14 @@ class Player extends Model
             'is_host' => 'boolean',
             'is_ready' => 'boolean',
         ];
+    }
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::creating(function (self $player): void {
+            $player->secret_token ??= bin2hex(random_bytes(32));
+        });
     }
 }
