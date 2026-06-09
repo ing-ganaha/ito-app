@@ -13,7 +13,12 @@ export const saveSession = (session: Session): void => {
 export const loadSession = (): Session | null => {
   const raw = localStorage.getItem(STORAGE_KEY)
   if (!raw) return null
-  return JSON.parse(raw) as Session
+  try {
+    return JSON.parse(raw) as Session
+  } catch {
+    localStorage.removeItem(STORAGE_KEY)
+    return null
+  }
 }
 
 export const clearSession = (): void => {

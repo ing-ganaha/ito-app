@@ -70,6 +70,7 @@ export const useLobby = (code: string | undefined) => {
   const allReady = players.length > 0 && readyCount === players.length
 
   const statusText = (() => {
+    if (!data) return '読み込み中...'
     if (!currentPlayer?.isReady) return '他のプレイヤーを待っています...'
     if (!allReady) return '全員が準備完了になるとゲームを開始できます'
     return '全員準備完了！ゲームを開始できます'
@@ -91,7 +92,8 @@ export const useLobby = (code: string | undefined) => {
   }, [room?.status, code, navigate])
 
   const handleAction = () => {
-    if (!currentPlayer?.isReady) {
+    if (!currentPlayer) return
+    if (!currentPlayer.isReady) {
       readyMutation.mutate()
       return
     }

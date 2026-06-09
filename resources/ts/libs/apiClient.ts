@@ -12,7 +12,7 @@ export const apiClient = async <T>(path: string, options: RequestOptions = {}): 
 
   const session = loadSession()
   const headers: HeadersInit = {
-    'Content-Type': 'application/json',
+    ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
     Accept: 'application/json',
     ...(session ? { 'X-Player-Token': session.secretToken } : {}),
   }
@@ -24,7 +24,8 @@ export const apiClient = async <T>(path: string, options: RequestOptions = {}): 
   })
 
   if (!response.ok) {
-    throw new Error(`${response.status}`)
+    const errorBody = (await response.json().catch(() => null)) as { message?: string } | null
+    throw new Error(errorBody?.message ?? `HTTP ${response.status}`)
   }
 
   return response.json() as Promise<T>

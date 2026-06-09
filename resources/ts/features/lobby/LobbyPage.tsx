@@ -12,10 +12,11 @@ const LobbyPage = () => {
   const { code } = useParams<{ code: string }>()
   const { players, currentPlayer, readyCount, allReady, statusText, handleAction } = useLobby(code)
 
-  const actionIcon = currentPlayer.isReady ? 'rocket_launch' : 'check_circle'
-  const actionLabel = currentPlayer.isReady ? 'ゲームを開始する' : '準備OK'
-  const actionBg = currentPlayer.isReady ? colors.primary : colors.secondary
-  const actionDisabled = currentPlayer.isReady && (!currentPlayer.isHost || !allReady)
+  const actionIcon = currentPlayer?.isReady ? 'rocket_launch' : 'check_circle'
+  const actionLabel = currentPlayer?.isReady ? 'ゲームを開始する' : '準備OK'
+  const actionBg = currentPlayer?.isReady ? colors.primary : colors.secondary
+  const actionDisabled =
+    !currentPlayer || (currentPlayer.isReady && (!currentPlayer.isHost || !allReady))
 
   return (
     <Box minH="100vh" display="flex" flexDir="column">
