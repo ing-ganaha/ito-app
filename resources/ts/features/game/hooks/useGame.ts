@@ -33,6 +33,9 @@ export const useGame = (code: string | undefined) => {
     topic: room?.topic ?? null,
     number: currentPlayer?.number ?? null,
     isReady: currentPlayer?.is_ready ?? false,
-    handleReady: () => readyMutation.mutate(),
+    handleReady: () => {
+      if (!currentPlayer || readyMutation.isPending) return
+      readyMutation.mutate()
+    },
   }
 }

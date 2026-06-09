@@ -14,7 +14,7 @@ export const useResult = (code: string | undefined) => {
 
   const room = data?.data
   const sortedPlayers: RoomPlayer[] = [...(room?.players ?? [])].sort(
-    (a, b) => (a.number ?? 0) - (b.number ?? 0)
+    (a, b) => (a.number ?? Infinity) - (b.number ?? Infinity)
   )
 
   return {

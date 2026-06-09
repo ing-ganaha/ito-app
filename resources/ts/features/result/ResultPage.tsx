@@ -76,7 +76,7 @@ const ResultPage = () => {
 
           <Flex direction="column" gap="8px" w="full" maxW="xl" mb="32px">
             {players.map((p) => (
-              <ResultRow key={p.id} name={p.name} number={p.number ?? 0} />
+              <ResultRow key={p.id} name={p.name} number={p.number} />
             ))}
           </Flex>
 
@@ -146,7 +146,7 @@ const ResultPage = () => {
 
 // ── Sub-components ────────────────────────────────────────────
 
-const ResultRow = ({ name, number }: { name: string; number: number }) => (
+const ResultRow = ({ name, number }: { name: string; number: number | null }) => (
   <Flex
     bg={colors.surfaceContainerLowest}
     border="1px solid"
@@ -172,7 +172,7 @@ const ResultRow = ({ name, number }: { name: string; number: number }) => (
       letterSpacing="-0.02em"
       color={colors.secondary}
     >
-      {String(number).padStart(2, '0')}
+      {number !== null ? String(number).padStart(2, '0') : '--'}
     </Text>
   </Flex>
 )

@@ -94,11 +94,11 @@ export const useLobby = (code: string | undefined) => {
   const handleAction = () => {
     if (!currentPlayer) return
     if (!currentPlayer.isReady) {
-      readyMutation.mutate()
+      if (!readyMutation.isPending) readyMutation.mutate()
       return
     }
     if (currentPlayer.isHost && allReady) {
-      startMutation.mutate()
+      if (!startMutation.isPending) startMutation.mutate()
     }
   }
 
