@@ -1,22 +1,22 @@
 import React from 'react'
-import { useNavigate } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { Box, Flex, Text } from '@chakra-ui/react'
 import TopBar from '../../components/TopBar'
 import Icon from '../../components/Icon'
 import { colors } from '../../libs/theme/colors'
 import { routes } from '../../const/routes'
-
-// TODO: replace with API response (sorted ascending by number)
-const MOCK_TOPIC = '夏の風物詩'
-const MOCK_RESULTS = [
-  { name: 'アレックス', number: 7 },
-  { name: 'ジョーダン', number: 34 },
-  { name: 'サム', number: 68 },
-  { name: 'テイラー', number: 95 },
-]
+import { clearSession } from '../../libs/playerSession'
+import { useResult } from './hooks/useResult'
 
 const ResultPage = () => {
   const navigate = useNavigate()
+  const { code } = useParams<{ code: string }>()
+  const { topic, players } = useResult(code)
+
+  const handleLeave = () => {
+    clearSession()
+    navigate(routes.home)
+  }
 
   return (
     <Box
@@ -70,13 +70,13 @@ const ResultPage = () => {
               textTransform="uppercase"
               px={1}
             >
-              今回のお題: {MOCK_TOPIC}
+              今回のお題: {topic ?? '...'}
             </Text>
           </Box>
 
           <Flex direction="column" gap="8px" w="full" maxW="xl" mb="32px">
-            {MOCK_RESULTS.map(({ name, number }) => (
-              <ResultRow key={name} name={name} number={number} />
+            {players.map((p) => (
+              <ResultRow key={p.id} name={p.name} number={p.number ?? 0} />
             ))}
           </Flex>
 
@@ -107,7 +107,7 @@ const ResultPage = () => {
               cursor="pointer"
               transition="background 0.2s"
               _hover={{ bg: colors.surfaceVariant }}
-              onClick={() => navigate(routes.home)}
+              onClick={handleLeave}
             >
               <Icon name="home" />
               ホームに戻る
@@ -132,7 +132,7 @@ const ResultPage = () => {
               cursor="pointer"
               transition="opacity 0.2s"
               _hover={{ opacity: 0.9 }}
-              onClick={() => navigate(routes.home)}
+              onClick={handleLeave}
             >
               <Icon name="replay" />
               もう一度遊ぶ

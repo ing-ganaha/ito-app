@@ -6,7 +6,6 @@ import Icon from '../../components/Icon'
 import { colors } from '../../libs/theme/colors'
 import { useLobby, type Player } from './hooks/useLobby'
 
-const ROOM_CODE = '284910'
 const formatCode = (code: string) => `${code.slice(0, 3)} ${code.slice(3)}`
 
 const LobbyPage = () => {
@@ -51,7 +50,7 @@ const LobbyPage = () => {
 
         <Grid templateColumns={{ base: '1fr', md: 'repeat(12, 1fr)' }} gap="24px">
           <GridItem colSpan={{ base: 1, md: 4 }}>
-            <RoomCodeCard code={ROOM_CODE} />
+            <RoomCodeCard code={code ?? ''} />
           </GridItem>
           <GridItem colSpan={{ base: 1, md: 8 }}>
             <PlayerRoster players={players} readyCount={readyCount} />
