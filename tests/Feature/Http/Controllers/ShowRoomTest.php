@@ -83,7 +83,7 @@ class ShowRoomTest extends TestCase
         $player = Player::factory()->for(Room::factory()->create())->create();
 
         $response = $this->getJson(
-            '/api/rooms/XXXXXX',
+            route('rooms.show', ['room' => 'XXXXXX']),
             ['X-Player-Token' => $player->secret_token],
         );
 

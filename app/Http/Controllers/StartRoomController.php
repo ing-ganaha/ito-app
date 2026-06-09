@@ -17,15 +17,17 @@ class StartRoomController extends Controller
     /**
      * ゲーム開始.
      */
-    public function __invoke(StartRoomRequest $request, Room $room): JsonResource
+    public function __invoke(StartRoomRequest $_request, Room $room): JsonResource
     {
         abort_if($room->status !== RoomStatus::Waiting, 409, 'ゲームはすでに開始されています');
 
-        $players = $room->players()->get();
+        DB::transaction(function () use ($room): void {
+            $players = $room->players()->lockForUpdate()->get();
 
-        $numbers = collect(range(1, 100))->shuffle()->take($players->count())->values();
+            abort_if($players->count() < 2, 422, 'ゲームを開始するには2人以上のプレイヤーが必要です');
 
-        DB::transaction(function () use ($room, $players, $numbers): void {
+            $numbers = collect(range(1, 100))->shuffle()->take($players->count())->values();
+
             $room->status = RoomStatus::Playing;
             $room->save();
 

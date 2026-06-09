@@ -8,16 +8,17 @@ use App\Enums\RoomStatus;
 use App\Http\Requests\StorePlayerRequest;
 use App\Http\Resources\RoomResource;
 use App\Models\Room;
-use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Http\JsonResponse;
 
 class StorePlayerController extends Controller
 {
     /**
      * ルーム参加.
      */
-    public function __invoke(StorePlayerRequest $request, Room $room): JsonResource
+    public function __invoke(StorePlayerRequest $request, Room $room): JsonResponse
     {
         abort_if($room->status !== RoomStatus::Waiting, 409, 'このルームには参加できません');
+        abort_if($room->players()->count() >= 8, 422, 'このルームは満員です');
 
         /** @var string $name */
         $name = $request->validated('name');
@@ -31,6 +32,6 @@ class StorePlayerController extends Controller
                 'id' => $player->id,
                 'secret_token' => $player->secret_token,
             ],
-        ]);
+        ])->response()->setStatusCode(201);
     }
 }

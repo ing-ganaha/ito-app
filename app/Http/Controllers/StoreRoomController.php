@@ -7,31 +7,40 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreRoomRequest;
 use App\Http\Resources\RoomResource;
 use App\Models\Room;
-use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class StoreRoomController extends Controller
 {
     /**
      * ルーム作成.
      */
-    public function __invoke(StoreRoomRequest $request): JsonResource
+    public function __invoke(StoreRoomRequest $request): JsonResponse
     {
-        [$room, $player] = DB::transaction(function () use ($request) {
-            $room = new Room;
-            $room->code = $this->generateUniqueCode();
-            $room->save();
+        [$room, $player] = retry(
+            5,
+            fn () => DB::transaction(function () use ($request) {
+                $room = new Room;
+                $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+                $room->code = implode('', array_map(
+                    fn () => $chars[random_int(0, strlen($chars) - 1)],
+                    range(1, 6),
+                ));
+                $room->save();
 
-            /** @var string $name */
-            $name = $request->validated('name');
+                /** @var string $name */
+                $name = $request->validated('name');
 
-            $player = $room->players()->make(['name' => $name]);
-            $player->is_host = true;
-            $player->save();
+                $player = $room->players()->make(['name' => $name]);
+                $player->is_host = true;
+                $player->save();
 
-            return [$room, $player];
-        });
+                return [$room, $player];
+            }),
+            0,
+            fn ($e) => $e instanceof UniqueConstraintViolationException,
+        );
 
         $room->load('players');
 
@@ -40,15 +49,6 @@ class StoreRoomController extends Controller
                 'id' => $player->id,
                 'secret_token' => $player->secret_token,
             ],
-        ]);
-    }
-
-    private function generateUniqueCode(): string
-    {
-        do {
-            $code = strtoupper(Str::random(6));
-        } while (Room::query()->where('code', $code)->exists());
-
-        return $code;
+        ])->response()->setStatusCode(201);
     }
 }

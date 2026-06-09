@@ -24,7 +24,7 @@ class StorePlayerTest extends TestCase
 
         $response = $this->postJson(route('rooms.players.store', $room), ['name' => 'じろう']);
 
-        $response->assertOk();
+        $response->assertCreated();
 
         $player = $room->players()->where('name', 'じろう')->sole();
 
@@ -69,7 +69,7 @@ class StorePlayerTest extends TestCase
 
         $response = $this->postJson(route('rooms.players.store', $room), ['name' => 'たろう']);
 
-        $response->assertOk();
+        $response->assertCreated();
     }
 
     public function test_cannot_join_room_that_is_not_waiting(): void
@@ -84,7 +84,7 @@ class StorePlayerTest extends TestCase
 
     public function test_returns_not_found_for_unknown_room_code(): void
     {
-        $response = $this->postJson('/api/rooms/UNKNOWN/players', ['name' => 'じろう']);
+        $response = $this->postJson(route('rooms.players.store', ['room' => 'UNKNOWN']), ['name' => 'じろう']);
 
         $response->assertNotFound();
     }

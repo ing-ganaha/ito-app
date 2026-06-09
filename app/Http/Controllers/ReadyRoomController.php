@@ -28,10 +28,13 @@ class ReadyRoomController extends Controller
             $player->is_ready = true;
             $player->save();
 
-            if ($room->status === RoomStatus::Playing &&
-                $room->players()->where('is_ready', false)->doesntExist()) {
+            $freshRoom = Room::query()->lockForUpdate()->find($room->id);
+
+            if ($freshRoom->status === RoomStatus::Playing &&
+                $freshRoom->players()->where('is_ready', false)->doesntExist()) {
+                $freshRoom->status = RoomStatus::Finished;
+                $freshRoom->save();
                 $room->status = RoomStatus::Finished;
-                $room->save();
             }
         });
 

@@ -104,6 +104,20 @@ class StartRoomTest extends TestCase
         $response->assertConflict();
     }
 
+    public function test_cannot_start_game_with_less_than_two_players(): void
+    {
+        $room = Room::factory()->create();
+        $host = Player::factory()->for($room)->create(['is_host' => true]);
+
+        $response = $this->postJson(
+            route('rooms.start', $room),
+            [],
+            ['X-Player-Token' => $host->secret_token],
+        );
+
+        $response->assertUnprocessable();
+    }
+
     public function test_requires_player_token(): void
     {
         $room = Room::factory()->create();

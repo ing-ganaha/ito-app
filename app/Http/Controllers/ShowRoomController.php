@@ -14,7 +14,7 @@ class ShowRoomController extends Controller
     /**
      * ルーム状態取得.
      */
-    public function __invoke(ShowRoomRequest $request, Room $room): JsonResource
+    public function __invoke(ShowRoomRequest $_request, Room $room): JsonResource
     {
         $room->load('players');
 
