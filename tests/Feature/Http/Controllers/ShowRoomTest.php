@@ -25,7 +25,7 @@ class ShowRoomTest extends TestCase
 
         $response = $this->getJson(
             route('rooms.show', $room),
-            ['X-Player-Token' => $player->secret_token],
+            ['X-Player-Token' => $player->rawToken],
         );
 
         $response->assertOk();
@@ -72,7 +72,7 @@ class ShowRoomTest extends TestCase
 
         $response = $this->getJson(
             route('rooms.show', $room),
-            ['X-Player-Token' => $otherPlayer->secret_token],
+            ['X-Player-Token' => $otherPlayer->rawToken],
         );
 
         $response->assertForbidden();
@@ -84,7 +84,7 @@ class ShowRoomTest extends TestCase
 
         $response = $this->getJson(
             route('rooms.show', ['room' => 'XXXXXX']),
-            ['X-Player-Token' => $player->secret_token],
+            ['X-Player-Token' => $player->rawToken],
         );
 
         $response->assertNotFound();

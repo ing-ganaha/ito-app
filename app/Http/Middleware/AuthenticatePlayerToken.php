@@ -19,7 +19,7 @@ class AuthenticatePlayerToken
             abort(401);
         }
 
-        $player = Player::query()->where('secret_token', $token)->first();
+        $player = Player::query()->where('secret_token', hash('sha256', $token))->first();
 
         if (! $player) {
             abort(401);

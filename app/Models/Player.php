@@ -35,10 +35,16 @@ class Player extends Model
         ];
     }
 
+    public string $rawToken = '';
+
     protected static function booted(): void
     {
         static::creating(function (self $player): void {
-            $player->secret_token ??= bin2hex(random_bytes(32));
+            if (empty($player->secret_token)) {
+                $raw = bin2hex(random_bytes(32));
+                $player->rawToken = $raw;
+                $player->secret_token = hash('sha256', $raw);
+            }
         });
     }
 }

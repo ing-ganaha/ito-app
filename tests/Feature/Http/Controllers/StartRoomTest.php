@@ -28,7 +28,7 @@ class StartRoomTest extends TestCase
         $response = $this->postJson(
             route('rooms.start', $room),
             [],
-            ['X-Player-Token' => $host->secret_token],
+            ['X-Player-Token' => $host->rawToken],
         );
 
         $response->assertOk();
@@ -45,7 +45,7 @@ class StartRoomTest extends TestCase
         $this->postJson(
             route('rooms.start', $room),
             [],
-            ['X-Player-Token' => $host->secret_token],
+            ['X-Player-Token' => $host->rawToken],
         );
 
         $numbers = $room->players()->pluck('number');
@@ -67,7 +67,7 @@ class StartRoomTest extends TestCase
         $this->postJson(
             route('rooms.start', $room),
             [],
-            ['X-Player-Token' => $host->secret_token],
+            ['X-Player-Token' => $host->rawToken],
         );
 
         $room->players()->each(
@@ -84,7 +84,7 @@ class StartRoomTest extends TestCase
         $response = $this->postJson(
             route('rooms.start', $room),
             [],
-            ['X-Player-Token' => $guest->secret_token],
+            ['X-Player-Token' => $guest->rawToken],
         );
 
         $response->assertForbidden();
@@ -98,7 +98,7 @@ class StartRoomTest extends TestCase
         $response = $this->postJson(
             route('rooms.start', $room),
             [],
-            ['X-Player-Token' => $host->secret_token],
+            ['X-Player-Token' => $host->rawToken],
         );
 
         $response->assertConflict();
@@ -112,7 +112,7 @@ class StartRoomTest extends TestCase
         $response = $this->postJson(
             route('rooms.start', $room),
             [],
-            ['X-Player-Token' => $host->secret_token],
+            ['X-Player-Token' => $host->rawToken],
         );
 
         $response->assertUnprocessable();

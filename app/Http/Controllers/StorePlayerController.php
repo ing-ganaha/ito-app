@@ -9,6 +9,7 @@ use App\Http\Requests\StorePlayerRequest;
 use App\Http\Resources\RoomResource;
 use App\Models\Room;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 
 class StorePlayerController extends Controller
 {
@@ -17,20 +18,25 @@ class StorePlayerController extends Controller
      */
     public function __invoke(StorePlayerRequest $request, Room $room): JsonResponse
     {
-        abort_if($room->status !== RoomStatus::Waiting, 409, 'このルームには参加できません');
-        abort_if($room->players()->count() >= 8, 422, 'このルームは満員です');
+        [$room, $player] = DB::transaction(function () use ($request, $room) {
+            $lockedRoom = Room::query()->lockForUpdate()->find($room->id);
 
-        /** @var string $name */
-        $name = $request->validated('name');
+            abort_if($lockedRoom->status !== RoomStatus::Waiting, 409, 'このルームには参加できません');
+            abort_if($lockedRoom->players()->count() >= 8, 422, 'このルームは満員です');
 
-        $player = $room->players()->create(['name' => $name]);
+            /** @var string $name */
+            $name = $request->validated('name');
 
-        $room->load('players');
+            $player = $lockedRoom->players()->create(['name' => $name]);
+            $lockedRoom->load('players');
+
+            return [$lockedRoom, $player];
+        });
 
         return RoomResource::make($room)->additional([
             'player' => [
                 'id' => $player->id,
-                'secret_token' => $player->secret_token,
+                'secret_token' => $player->rawToken,
             ],
         ])->response()->setStatusCode(201);
     }

@@ -47,7 +47,7 @@ class StoreRoomController extends Controller
         return RoomResource::make($room)->additional([
             'player' => [
                 'id' => $player->id,
-                'secret_token' => $player->secret_token,
+                'secret_token' => $player->rawToken,
             ],
         ])->response()->setStatusCode(201);
     }

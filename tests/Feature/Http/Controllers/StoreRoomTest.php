@@ -39,9 +39,9 @@ class StoreRoomTest extends TestCase
             ],
             'player' => [
                 'id' => $player->id,
-                'secret_token' => $player->secret_token,
             ],
         ]);
+        $this->assertNotEmpty($response->json('player.secret_token'));
     }
 
     public function test_room_code_is_six_uppercase_characters(): void
@@ -50,7 +50,7 @@ class StoreRoomTest extends TestCase
 
         $code = $response->json('data.code');
 
-        $this->assertMatchesRegularExpression('/\A[A-Z0-9]{6}\z/', $code);
+        $this->assertMatchesRegularExpression('/\A[A-HJ-NP-Z2-9]{6}\z/', $code);
     }
 
     public function test_requires_name(): void

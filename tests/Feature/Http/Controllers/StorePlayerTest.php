@@ -37,9 +37,9 @@ class StorePlayerTest extends TestCase
             ],
             'player' => [
                 'id' => $player->id,
-                'secret_token' => $player->secret_token,
             ],
         ]);
+        $this->assertNotEmpty($response->json('player.secret_token'));
     }
 
     public function test_requires_name(): void

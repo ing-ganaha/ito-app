@@ -19,17 +19,19 @@ class StartRoomController extends Controller
      */
     public function __invoke(StartRoomRequest $_request, Room $room): JsonResource
     {
-        abort_if($room->status !== RoomStatus::Waiting, 409, 'ゲームはすでに開始されています');
-
         DB::transaction(function () use ($room): void {
-            $players = $room->players()->lockForUpdate()->get();
+            $freshRoom = Room::query()->lockForUpdate()->find($room->id);
+
+            abort_if($freshRoom->status !== RoomStatus::Waiting, 409, 'ゲームはすでに開始されています');
+
+            $players = $freshRoom->players()->lockForUpdate()->get();
 
             abort_if($players->count() < 2, 422, 'ゲームを開始するには2人以上のプレイヤーが必要です');
 
             $numbers = collect(range(1, 100))->shuffle()->take($players->count())->values();
 
-            $room->status = RoomStatus::Playing;
-            $room->save();
+            $freshRoom->status = RoomStatus::Playing;
+            $freshRoom->save();
 
             $players->each(function (Player $player, int $index) use ($numbers): void {
                 $player->number = $numbers->get($index);
@@ -38,7 +40,7 @@ class StartRoomController extends Controller
             });
         });
 
-        $room->load('players');
+        $room->refresh()->load('players');
 
         return RoomResource::make($room);
     }

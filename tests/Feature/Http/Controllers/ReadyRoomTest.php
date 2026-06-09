@@ -27,7 +27,7 @@ class ReadyRoomTest extends TestCase
         $response = $this->postJson(
             route('rooms.ready', $room),
             [],
-            ['X-Player-Token' => $player->secret_token],
+            ['X-Player-Token' => $player->rawToken],
         );
 
         $response->assertOk();
@@ -42,7 +42,7 @@ class ReadyRoomTest extends TestCase
         $response = $this->postJson(
             route('rooms.ready', $room),
             [],
-            ['X-Player-Token' => $player->secret_token],
+            ['X-Player-Token' => $player->rawToken],
         );
 
         $response->assertOk();
@@ -58,7 +58,7 @@ class ReadyRoomTest extends TestCase
         $this->postJson(
             route('rooms.ready', $room),
             [],
-            ['X-Player-Token' => $player2->secret_token],
+            ['X-Player-Token' => $player2->rawToken],
         );
 
         $this->assertSame(RoomStatus::Finished, $room->fresh()->status);
@@ -72,7 +72,7 @@ class ReadyRoomTest extends TestCase
         $this->postJson(
             route('rooms.ready', $room),
             [],
-            ['X-Player-Token' => $player->secret_token],
+            ['X-Player-Token' => $player->rawToken],
         );
 
         $this->assertSame(RoomStatus::Waiting, $room->fresh()->status);
@@ -86,7 +86,7 @@ class ReadyRoomTest extends TestCase
         $response = $this->postJson(
             route('rooms.ready', $room),
             [],
-            ['X-Player-Token' => $player->secret_token],
+            ['X-Player-Token' => $player->rawToken],
         );
 
         $response->assertConflict();
@@ -100,7 +100,7 @@ class ReadyRoomTest extends TestCase
         $response = $this->postJson(
             route('rooms.ready', $room),
             [],
-            ['X-Player-Token' => $otherPlayer->secret_token],
+            ['X-Player-Token' => $otherPlayer->rawToken],
         );
 
         $response->assertForbidden();
