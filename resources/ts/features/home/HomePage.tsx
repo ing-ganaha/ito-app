@@ -1,11 +1,14 @@
 import React from 'react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
+import { useMutation } from '@tanstack/react-query'
 import { Box, Flex, Input, Text, Dialog } from '@chakra-ui/react'
 import TopBar from '../../components/TopBar'
 import Icon from '../../components/Icon'
 import { colors } from '../../libs/theme/colors'
 import { routes } from '../../const/routes'
+import { createRoom, joinRoom } from '../../libs/api/rooms'
+import { saveSession } from '../../libs/playerSession'
 
 const HomePage = () => {
   const navigate = useNavigate()
@@ -13,17 +16,39 @@ const HomePage = () => {
   const [joinCode, setJoinCode] = useState('')
   const [isJoinOpen, setIsJoinOpen] = useState(false)
 
+  const createMutation = useMutation({
+    mutationFn: () => createRoom(name),
+    onSuccess: (res) => {
+      saveSession({
+        roomCode: res.data.code,
+        playerId: res.player.id,
+        secretToken: res.player.secret_token,
+      })
+      navigate(routes.lobby(res.data.code))
+    },
+  })
+
+  const joinMutation = useMutation({
+    mutationFn: () => joinRoom(joinCode, name),
+    onSuccess: (res) => {
+      saveSession({
+        roomCode: res.data.code,
+        playerId: res.player.id,
+        secretToken: res.player.secret_token,
+      })
+      navigate(routes.lobby(res.data.code))
+      setIsJoinOpen(false)
+    },
+  })
+
   const handleCreateRoom = () => {
     if (!name.trim()) return
-    // TODO: POST /api/rooms → navigate to returned code
-    navigate(routes.lobby('DEMO01'))
+    createMutation.mutate()
   }
 
   const handleJoinRoom = () => {
     if (!name.trim() || joinCode.length !== 6) return
-    // TODO: POST /api/rooms/:code/join
-    navigate(routes.lobby(joinCode))
-    setIsJoinOpen(false)
+    joinMutation.mutate()
   }
 
   return (

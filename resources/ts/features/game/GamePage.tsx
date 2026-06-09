@@ -1,18 +1,14 @@
 import React from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { useParams } from 'react-router'
 import { Box, Flex, Text } from '@chakra-ui/react'
 import TopBar from '../../components/TopBar'
 import Icon from '../../components/Icon'
 import { colors } from '../../libs/theme/colors'
-import { routes } from '../../const/routes'
-
-// TODO: replace with API response
-const MOCK_TOPIC = 'コンビニにあるもの'
-const MOCK_NUMBER = 73
+import { useGame } from './hooks/useGame'
 
 const GamePage = () => {
-  const navigate = useNavigate()
   const { code } = useParams<{ code: string }>()
+  const { topic, number, isReady, handleReady } = useGame(code)
 
   return (
     <Box minH="100vh" display="flex" flexDir="column">
@@ -32,8 +28,8 @@ const GamePage = () => {
         w="full"
         mx="auto"
       >
-        <TopicCard topic={MOCK_TOPIC} />
-        <NumberCard number={MOCK_NUMBER} />
+        <TopicCard topic={topic ?? '...'} />
+        {number !== null && <NumberCard number={number} />}
 
         <Flex direction="column" align="center" gap="16px" w="full" maxW="sm" mt="16px">
           <Text
@@ -52,22 +48,23 @@ const GamePage = () => {
             alignItems="center"
             justifyContent="center"
             gap={2}
-            bg={colors.primary}
+            bg={isReady ? colors.outlineVariant : colors.primary}
             color={colors.onPrimary}
             fontSize="24px"
             fontWeight="700"
             borderRadius="full"
             py={4}
             border="none"
-            cursor="pointer"
+            cursor={isReady ? 'not-allowed' : 'pointer'}
+            opacity={isReady ? 0.6 : 1}
             boxShadow="md"
             transition="all 0.2s"
-            _hover={{ opacity: 0.9 }}
-            _active={{ transform: 'scale(0.98)' }}
-            onClick={() => navigate(routes.result(code ?? 'DEMO01'))}
+            _hover={isReady ? {} : { opacity: 0.9 }}
+            _active={isReady ? {} : { transform: 'scale(0.98)' }}
+            onClick={isReady ? undefined : handleReady}
           >
-            <Icon name="visibility" filled />
-            結果を見る
+            <Icon name={isReady ? 'hourglass_top' : 'visibility'} filled />
+            {isReady ? '他のプレイヤーを待っています...' : '結果を見る'}
           </Box>
         </Flex>
       </Flex>
