@@ -19,6 +19,15 @@ class Room extends Model
     /** @use HasFactory<RoomFactory> */
     use HasFactory;
 
+    /**
+     * 新規作成時のデフォルト値.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'status' => RoomStatus::Waiting->value,
+    ];
+
     /** @return HasMany<Player, $this> */
     public function players(): HasMany
     {
