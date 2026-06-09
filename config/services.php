@@ -14,6 +14,10 @@ return [
     |
     */
 
+    'anthropic' => [
+        'api_key' => env('CLAUDE_CODE_OAUTH_TOKEN'),
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],

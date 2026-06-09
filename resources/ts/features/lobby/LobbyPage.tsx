@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useParams } from 'react-router'
 import { Box, Flex, Grid, GridItem, Text } from '@chakra-ui/react'
 import TopBar from '../../components/TopBar'
@@ -90,60 +90,70 @@ const LobbyPage = () => {
 
 // ── Sub-components ────────────────────────────────────────────
 
-const RoomCodeCard = ({ code }: { code: string }) => (
-  <Flex
-    direction="column"
-    align="center"
-    justify="center"
-    textAlign="center"
-    bg={colors.tertiaryFixed}
-    borderRadius="xl"
-    p="32px"
-    minH="250px"
-    gap={4}
-  >
-    <Text
-      fontSize="12px"
-      fontWeight="600"
-      letterSpacing="0.05em"
-      color={colors.onSurfaceVariant}
-      textTransform="uppercase"
+const RoomCodeCard = ({ code }: { code: string }) => {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(code)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <Flex
+      direction="column"
+      align="center"
+      justify="center"
+      textAlign="center"
+      bg={colors.tertiaryFixed}
+      borderRadius="xl"
+      p="32px"
+      minH="250px"
+      gap={4}
     >
-      ルームコード
-    </Text>
-    <Text
-      fontSize="48px"
-      fontWeight="800"
-      letterSpacing="0.15em"
-      color={colors.primary}
-      userSelect="none"
-    >
-      {formatCode(code)}
-    </Text>
-    <Box
-      as="button"
-      display="flex"
-      alignItems="center"
-      gap={2}
-      bg={colors.surfaceContainerLowest}
-      border="1px solid"
-      borderColor={colors.outlineVariant}
-      borderRadius="full"
-      px={6}
-      py={2}
-      fontSize="14px"
-      fontWeight="700"
-      color={colors.primary}
-      cursor="pointer"
-      transition="background 0.2s"
-      _hover={{ bg: colors.surfaceVariant }}
-      onClick={() => navigator.clipboard.writeText(code)}
-    >
-      <Icon name="content_copy" size={18} />
-      コードをコピー
-    </Box>
-  </Flex>
-)
+      <Text
+        fontSize="12px"
+        fontWeight="600"
+        letterSpacing="0.05em"
+        color={colors.onSurfaceVariant}
+        textTransform="uppercase"
+      >
+        ルームコード
+      </Text>
+      <Text
+        fontSize="48px"
+        fontWeight="800"
+        letterSpacing="0.15em"
+        color={colors.primary}
+        userSelect="none"
+      >
+        {formatCode(code)}
+      </Text>
+      <Box
+        as="button"
+        display="flex"
+        alignItems="center"
+        gap={2}
+        bg={copied ? colors.secondaryContainer : colors.surfaceContainerLowest}
+        border="1px solid"
+        borderColor={copied ? colors.secondary : colors.outlineVariant}
+        borderRadius="full"
+        px={6}
+        py={2}
+        fontSize="14px"
+        fontWeight="700"
+        color={copied ? colors.secondary : colors.primary}
+        cursor="pointer"
+        transition="all 0.2s"
+        _hover={{ bg: copied ? colors.secondaryContainer : colors.surfaceVariant }}
+        onClick={handleCopy}
+      >
+        <Icon name={copied ? 'check' : 'content_copy'} size={18} />
+        {copied ? 'コピーしました！' : 'コードをコピー'}
+      </Box>
+    </Flex>
+  )
+}
 
 const PlayerRoster = ({ players, readyCount }: { players: Player[]; readyCount: number }) => (
   <Flex

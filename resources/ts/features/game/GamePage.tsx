@@ -98,6 +98,24 @@ const TopicCard = ({ topic }: { topic: string }) => (
       <Text fontSize={{ base: '28px', md: '32px' }} fontWeight="700" color={colors.primary} py={2}>
         {topic}
       </Text>
+      <Flex align="center" gap={2} mt={3}>
+        <Text fontSize="11px" fontWeight="600" color={colors.onSurfaceVariant} whiteSpace="nowrap">
+          1
+        </Text>
+        <Box flex={1} h="6px" borderRadius="full" overflow="hidden">
+          <Box
+            h="full"
+            w="full"
+            bgGradient={`linear(to-r, ${colors.outlineVariant}, ${colors.primary})`}
+          />
+        </Box>
+        <Text fontSize="11px" fontWeight="600" color={colors.primary} whiteSpace="nowrap">
+          100
+        </Text>
+      </Flex>
+      <Text fontSize="15px" color={colors.onSurfaceVariant} mt={1}>
+        数字が大きいほどお題に近い
+      </Text>
     </Box>
   </Box>
 )

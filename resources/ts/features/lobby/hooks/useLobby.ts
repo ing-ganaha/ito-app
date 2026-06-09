@@ -67,10 +67,11 @@ export const useLobby = (code: string | undefined) => {
   )
   const currentPlayer = players.find((p) => p.isCurrentUser)
   const readyCount = players.filter((p) => p.isReady).length
-  const allReady = players.length > 0 && readyCount === players.length
+  const allReady = players.length >= 3 && readyCount === players.length
 
   const statusText = (() => {
     if (!data) return '読み込み中...'
+    if (players.length < 3) return `ゲーム開始にはあと${3 - players.length}人必要です`
     if (!currentPlayer?.isReady) return '他のプレイヤーを待っています...'
     if (!allReady) return '全員が準備完了になるとゲームを開始できます'
     return '全員準備完了！ゲームを開始できます'

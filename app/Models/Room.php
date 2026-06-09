@@ -28,6 +28,11 @@ class Room extends Model
         'status' => RoomStatus::Waiting->value,
     ];
 
+    public function getRouteKeyName(): string
+    {
+        return 'code';
+    }
+
     /** @return HasMany<Player, $this> */
     public function players(): HasMany
     {
