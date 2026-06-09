@@ -8,7 +8,7 @@ use App\Models\Player;
 use App\Models\Room;
 use Illuminate\Foundation\Http\FormRequest;
 
-class ShowRoomRequest extends FormRequest
+class StartRoomRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -18,7 +18,7 @@ class ShowRoomRequest extends FormRequest
         /** @var Room $room */
         $room = $this->route('room');
 
-        return $player->room_id === $room->id;
+        return $player->room_id === $room->id && $player->is_host;
     }
 
     public function rules(): array
