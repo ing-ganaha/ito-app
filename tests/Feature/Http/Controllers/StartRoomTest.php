@@ -24,6 +24,7 @@ class StartRoomTest extends TestCase
         $room = Room::factory()->create();
         $host = Player::factory()->for($room)->create(['is_host' => true]);
         Player::factory()->for($room)->create();
+        Player::factory()->for($room)->create();
 
         $response = $this->postJson(
             route('rooms.start', $room),
@@ -62,6 +63,7 @@ class StartRoomTest extends TestCase
     {
         $room = Room::factory()->create();
         $host = Player::factory()->for($room)->create(['is_host' => true, 'is_ready' => true]);
+        Player::factory()->for($room)->create(['is_ready' => true]);
         Player::factory()->for($room)->create(['is_ready' => true]);
 
         $this->postJson(
@@ -104,10 +106,11 @@ class StartRoomTest extends TestCase
         $response->assertConflict();
     }
 
-    public function test_cannot_start_game_with_less_than_two_players(): void
+    public function test_cannot_start_game_with_less_than_three_players(): void
     {
         $room = Room::factory()->create();
         $host = Player::factory()->for($room)->create(['is_host' => true]);
+        Player::factory()->for($room)->create();
 
         $response = $this->postJson(
             route('rooms.start', $room),

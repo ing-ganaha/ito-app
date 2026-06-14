@@ -80,17 +80,10 @@ const ResultPage = () => {
             ))}
           </Flex>
 
-          <Flex
-            direction={{ base: 'column', md: 'row' }}
-            gap="16px"
-            w="full"
-            maxW="xl"
-            mt="auto"
-            pt="32px"
-          >
+          <Box w="full" maxW="xl" mt="auto" pt="32px">
             <Box
               as="button"
-              flex={1}
+              w="full"
               display="flex"
               alignItems="center"
               justifyContent="center"
@@ -112,32 +105,7 @@ const ResultPage = () => {
               <Icon name="home" />
               ホームに戻る
             </Box>
-
-            <Box
-              as="button"
-              flex={1}
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              gap={2}
-              bg={colors.secondary}
-              color={colors.onSecondary}
-              fontSize="14px"
-              fontWeight="700"
-              border="1px solid"
-              borderColor={colors.secondary}
-              borderRadius="lg"
-              py={4}
-              px="24px"
-              cursor="pointer"
-              transition="opacity 0.2s"
-              _hover={{ opacity: 0.9 }}
-              onClick={handleLeave}
-            >
-              <Icon name="replay" />
-              もう一度遊ぶ
-            </Box>
-          </Flex>
+          </Box>
         </Flex>
       </Box>
     </Box>
@@ -156,13 +124,7 @@ const ResultRow = ({ name, number }: { name: string; number: number | null }) =>
     justify="space-between"
     align="center"
   >
-    <Text
-      fontSize="12px"
-      fontWeight="600"
-      letterSpacing="0.05em"
-      color={colors.onSurfaceVariant}
-      textTransform="uppercase"
-    >
+    <Text fontSize="18px" fontWeight="700" color={colors.primary}>
       {name}
     </Text>
     <Text
