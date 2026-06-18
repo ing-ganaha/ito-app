@@ -3,6 +3,7 @@ import { useParams } from 'react-router'
 import { Box, Flex, Text } from '@chakra-ui/react'
 import TopBar from '../../components/TopBar'
 import Icon from '../../components/Icon'
+import LeaveButton from '../../components/LeaveButton'
 import { colors } from '../../libs/theme/colors'
 import { useGame } from './hooks/useGame'
 
@@ -66,6 +67,8 @@ const GamePage = () => {
             <Icon name={isReady ? 'hourglass_top' : 'visibility'} filled />
             {isReady ? '他のプレイヤーを待っています...' : '結果を見る'}
           </Box>
+
+          <LeaveButton code={code} />
         </Flex>
       </Flex>
     </Box>

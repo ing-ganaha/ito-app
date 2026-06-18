@@ -3,6 +3,7 @@ import { useParams } from 'react-router'
 import { Box, Flex, Grid, GridItem, Text } from '@chakra-ui/react'
 import TopBar from '../../components/TopBar'
 import Icon from '../../components/Icon'
+import LeaveButton from '../../components/LeaveButton'
 import { colors } from '../../libs/theme/colors'
 import { useLobby, type Player } from './hooks/useLobby'
 
@@ -82,6 +83,10 @@ const LobbyPage = () => {
             <Icon name={actionIcon} filled />
             {actionLabel}
           </Box>
+
+          <Flex justify="center" pt="16px">
+            <LeaveButton code={code} />
+          </Flex>
         </Box>
       </Box>
     </Box>

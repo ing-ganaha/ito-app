@@ -1,22 +1,16 @@
 import React from 'react'
-import { useNavigate, useParams } from 'react-router'
+import { useParams } from 'react-router'
 import { Box, Flex, Text } from '@chakra-ui/react'
 import TopBar from '../../components/TopBar'
 import Icon from '../../components/Icon'
 import { colors } from '../../libs/theme/colors'
-import { routes } from '../../const/routes'
-import { clearSession } from '../../libs/playerSession'
+import { useLeaveRoom } from '../../libs/useLeaveRoom'
 import { useResult } from './hooks/useResult'
 
 const ResultPage = () => {
-  const navigate = useNavigate()
   const { code } = useParams<{ code: string }>()
   const { topic, players } = useResult(code)
-
-  const handleLeave = () => {
-    clearSession()
-    navigate(routes.home)
-  }
+  const { leave: handleLeave } = useLeaveRoom(code)
 
   return (
     <Box

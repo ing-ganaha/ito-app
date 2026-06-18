@@ -8,7 +8,8 @@ import Icon from '../../components/Icon'
 import { colors } from '../../libs/theme/colors'
 import { routes } from '../../const/routes'
 import { createRoom, joinRoom } from '../../libs/api/rooms'
-import { saveSession } from '../../libs/playerSession'
+import { saveSession, loadSession } from '../../libs/playerSession'
+import { useLeaveRoom } from '../../libs/useLeaveRoom'
 import { ApiError } from '../../libs/apiClient'
 
 const toUserMessage = (error: unknown, context: 'join' | 'create'): string => {
@@ -24,6 +25,10 @@ const HomePage = () => {
   const [name, setName] = useState('')
   const [joinCode, setJoinCode] = useState('')
   const [isJoinOpen, setIsJoinOpen] = useState(false)
+
+  // 既に別のルームに参加済みなら、二重参加させず既存ルームに案内する
+  const session = loadSession()
+  const { leave, isLeaving } = useLeaveRoom(session?.roomCode)
 
   const createMutation = useMutation({
     mutationFn: () => createRoom(name),
@@ -80,77 +85,86 @@ const HomePage = () => {
         py={{ base: '32px', md: '80px' }}
       >
         <Box w="full" maxW="500px">
-          <Box
-            bg={colors.surfaceContainerLow}
-            p={{ base: 6, md: 8 }}
-            borderRadius="xl"
-            border="1px solid"
-            borderColor={colors.outlineVariant}
-          >
-            <Box mb={6}>
-              <Text
-                fontSize="14px"
-                fontWeight="700"
-                letterSpacing="0.02em"
-                color={colors.primary}
-                mb={2}
-              >
-                ニックネーム
-              </Text>
-              <Input
-                placeholder="名前を入力"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                bg={colors.surfaceContainerLowest}
-                borderColor={colors.outlineVariant}
-                color={colors.primary}
-                borderRadius="lg"
-                px={4}
-                py={3}
-                fontSize="16px"
-                _focus={{ outline: 'none', borderColor: colors.primary }}
-                _placeholder={{ color: colors.outline }}
-              />
-            </Box>
-
-            <Flex direction="column" gap={1}>
-              <ActionButton
-                bg={colors.primary}
-                color={colors.onPrimary}
-                onClick={handleCreateRoom}
-                disabled={!name.trim() || createMutation.isPending}
-              >
-                ルームを作る
-              </ActionButton>
-              {createError && (
-                <Text fontSize="13px" color="red.500" textAlign="center" pt={1}>
-                  {createError}
-                </Text>
-              )}
-
-              <Flex align="center" py={4} gap={4}>
-                <Box flex={1} h="1px" bg={colors.outlineVariant} />
+          {session ? (
+            <ResumePanel
+              roomCode={session.roomCode}
+              onResume={() => navigate(routes.lobby(session.roomCode))}
+              onLeave={leave}
+              isLeaving={isLeaving}
+            />
+          ) : (
+            <Box
+              bg={colors.surfaceContainerLow}
+              p={{ base: 6, md: 8 }}
+              borderRadius="xl"
+              border="1px solid"
+              borderColor={colors.outlineVariant}
+            >
+              <Box mb={6}>
                 <Text
-                  fontSize="12px"
-                  fontWeight="600"
-                  letterSpacing="0.05em"
-                  color={colors.onSurfaceVariant}
+                  fontSize="14px"
+                  fontWeight="700"
+                  letterSpacing="0.02em"
+                  color={colors.primary}
+                  mb={2}
                 >
-                  または
+                  ニックネーム
                 </Text>
-                <Box flex={1} h="1px" bg={colors.outlineVariant} />
-              </Flex>
+                <Input
+                  placeholder="名前を入力"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  bg={colors.surfaceContainerLowest}
+                  borderColor={colors.outlineVariant}
+                  color={colors.primary}
+                  borderRadius="lg"
+                  px={4}
+                  py={3}
+                  fontSize="16px"
+                  _focus={{ outline: 'none', borderColor: colors.primary }}
+                  _placeholder={{ color: colors.outline }}
+                />
+              </Box>
 
-              <ActionButton
-                bg={colors.secondary}
-                color={colors.onSecondary}
-                onClick={() => setIsJoinOpen(true)}
-                disabled={!name.trim()}
-              >
-                ルームに入る
-              </ActionButton>
-            </Flex>
-          </Box>
+              <Flex direction="column" gap={1}>
+                <ActionButton
+                  bg={colors.primary}
+                  color={colors.onPrimary}
+                  onClick={handleCreateRoom}
+                  disabled={!name.trim() || createMutation.isPending}
+                >
+                  ルームを作る
+                </ActionButton>
+                {createError && (
+                  <Text fontSize="13px" color="red.500" textAlign="center" pt={1}>
+                    {createError}
+                  </Text>
+                )}
+
+                <Flex align="center" py={4} gap={4}>
+                  <Box flex={1} h="1px" bg={colors.outlineVariant} />
+                  <Text
+                    fontSize="12px"
+                    fontWeight="600"
+                    letterSpacing="0.05em"
+                    color={colors.onSurfaceVariant}
+                  >
+                    または
+                  </Text>
+                  <Box flex={1} h="1px" bg={colors.outlineVariant} />
+                </Flex>
+
+                <ActionButton
+                  bg={colors.secondary}
+                  color={colors.onSecondary}
+                  onClick={() => setIsJoinOpen(true)}
+                  disabled={!name.trim()}
+                >
+                  ルームに入る
+                </ActionButton>
+              </Flex>
+            </Box>
+          )}
         </Box>
       </Flex>
 
@@ -171,6 +185,50 @@ const HomePage = () => {
 }
 
 // ── Sub-components ────────────────────────────────────────────
+
+interface ResumePanelProps {
+  roomCode: string
+  onResume: () => void
+  onLeave: () => void
+  isLeaving: boolean
+}
+
+const ResumePanel = ({ roomCode, onResume, onLeave, isLeaving }: ResumePanelProps) => (
+  <Box
+    bg={colors.surfaceContainerLow}
+    p={{ base: 6, md: 8 }}
+    borderRadius="xl"
+    border="1px solid"
+    borderColor={colors.outlineVariant}
+  >
+    <Flex direction="column" align="center" gap={2} mb={6} textAlign="center">
+      <Icon name="meeting_room" size={32} />
+      <Text fontSize="18px" fontWeight="700" color={colors.primary}>
+        参加中のルームがあります
+      </Text>
+      <Text fontSize="14px" color={colors.onSurfaceVariant}>
+        コード: {roomCode}
+      </Text>
+      <Text fontSize="13px" color={colors.onSurfaceVariant}>
+        同じブラウザでは1つのルームにのみ参加できます。
+      </Text>
+    </Flex>
+
+    <Flex direction="column" gap={3}>
+      <ActionButton bg={colors.primary} color={colors.onPrimary} onClick={onResume}>
+        ルームに戻る
+      </ActionButton>
+      <ActionButton
+        bg={colors.surfaceContainerLowest}
+        color={colors.primary}
+        onClick={onLeave}
+        disabled={isLeaving}
+      >
+        {isLeaving ? '退室中...' : '退室して新しく始める'}
+      </ActionButton>
+    </Flex>
+  </Box>
+)
 
 interface ActionButtonProps {
   children: React.ReactNode
