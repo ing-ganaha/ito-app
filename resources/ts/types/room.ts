@@ -19,6 +19,11 @@ export type RoomResponse = {
   data: RoomData
 }
 
+// 退室レスポンス: 部屋が残ればRoomData、全員退室で部屋が消えたらnull
+export type LeaveRoomResponse = {
+  data: RoomData | null
+}
+
 export type StoreRoomResponse = RoomResponse & {
   player: {
     id: number

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\LeaveRoomController;
 use App\Http\Controllers\ReadyRoomController;
 use App\Http\Controllers\ShowRoomController;
 use App\Http\Controllers\StartRoomController;
@@ -16,4 +17,5 @@ Route::middleware('player.token')->group(function (): void {
     Route::get('/rooms/{room}', ShowRoomController::class)->name('rooms.show');
     Route::post('/rooms/{room}/start', StartRoomController::class)->name('rooms.start');
     Route::post('/rooms/{room}/ready', ReadyRoomController::class)->name('rooms.ready');
+    Route::delete('/rooms/{room}/leave', LeaveRoomController::class)->name('rooms.leave');
 });
